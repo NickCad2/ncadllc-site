@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCad LLC — Independent Software Studio</title>
+<meta name="description" content="NCad LLC is an independent software studio based in Philadelphia, PA, building focused mobile apps for real communities — starting with HITS.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23201d1a%22/><text x=%2250%22 y=%2268%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23f2ede3%22 font-family=%22Georgia,serif%22>N</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Newsreader:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f2ede4;
+    --paper-2: #eae3d5;
+    --ink: #201d1a;
+    --muted: #6f6858;
+    --accent: #b5502f;
+    --accent-soft: #b5502f1a;
+    --line: #d9d0bd;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: var(--paper); }
+
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  a { color: inherit; }
+
+  /* ---------- background texture ---------- */
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+
+  .rule-v {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--line);
+    z-index: 0;
+  }
+  .rule-v.l { left: 6%; }
+  .rule-v.r { right: 6%; }
+  @media (max-width: 700px) { .rule-v { display: none; } }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 6%;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ---------- nav ---------- */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 34px 0;
+  }
+  .nav-mark {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+  }
+  .nav-links a { text-decoration: none; color: var(--muted); transition: color 0.25s; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    border: 1px solid var(--ink);
+    padding: 8px 16px;
+    color: var(--ink) !important;
+    transition: background 0.25s, color 0.25s;
+  }
+  .nav-cta:hover { background: var(--ink); color: var(--paper) !important; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    padding: 90px 0 120px;
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 34px; height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(2.6rem, 6.5vw, 4.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    max-width: 11ch;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
+
+  .hero-meta {
+    margin-top: 46px;
+    display: flex;
+    gap: 60px;
+    flex-wrap: wrap;
+  }
+  .hero-meta div { font-size: 0.85rem; color: var(--muted); }
+  .hero-meta span {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink);
+    font-size: 0.82rem;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ---------- sections ---------- */
+  section { padding: 76px 0; border-top: 1px solid var(--line); }
+
+  .sec-head {
+    display: flex;
+    gap: 18px;
+    align-items: baseline;
+    margin-bottom: 40px;
+  }
+  .sec-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+  .sec-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 60px;
+  }
+  @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+  .about-lede {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .about-body p { margin-bottom: 18px; color: #3a352d; }
+  .about-body p:last-child { margin-bottom: 0; }
+
+  /* ---------- products ---------- */
+  .product-card {
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 48px;
+    align-items: center;
+    position: relative;
+  }
+  @media (max-width: 700px) { .product-card { grid-template-columns: 1fr; padding: 28px; } }
+
+  .product-info .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .product-info .status::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .product-info h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 2.4rem;
+    margin-bottom: 16px;
+  }
+  .product-info p { color: #3a352d; margin-bottom: 24px; }
+  .product-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 3px;
+    transition: color 0.25s, border-color 0.25s;
+  }
+  .product-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  .product-shots {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+  .product-shots img {
+    width: 45%;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 48px -24px rgba(32,29,26,0.35);
+  }
+  .product-shots img:nth-child(2) { transform: translateY(28px); }
+
+  /* ---------- approach ---------- */
+  .approach-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  @media (max-width: 700px) { .approach-grid { grid-template-columns: 1fr; } }
+  .approach-item .num {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent);
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+  }
+  .approach-item h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  .approach-item p { color: var(--muted); font-size: 0.95rem; }
+
+  /* ---------- contact ---------- */
+  .contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .contact-row h2 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2rem, 5vw, 3rem);
+    max-width: 10ch;
+  }
+  .contact-details { text-align: right; }
+  @media (max-width: 700px) { .contact-details { text-align: left; } }
+  .contact-details a {
+    display: inline-block;
+    font-size: 1.1rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 10px;
+    transition: color 0.25s, border-color 0.25s;
+  }
+  .contact-details a:hover { color: var(--accent); border-color: var(--accent); }
+  .contact-details .loc { display: block; color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
+
+  /* ---------- footer ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 32px 0 48px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  footer a { text-decoration: none; color: var(--muted); }
+  footer a:hover { color: var(--ink); }
+  .footer-links { display: flex; gap: 22px; }
+
+  /* ---------- reveal ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="rule-v l"></div>
+<div class="rule-v r"></div>
+
+<div class="wrap">
+  <nav>
+    <a class="nav-mark" href="#">NCad LLC</a>
+    <div class="nav-links">
+      <a href="#products">Products</a>
+      <a href="#approach">Approach</a>
+      <a href="#contact">Contact</a>
+      <a class="nav-cta" href="https://www.howistheset.com" target="_blank" rel="noopener">HITS ↗</a>
+    </div>
+  </nav>
+
+  <section class="hero" style="border-top:none; padding-top: 40px;">
+    <p class="hero-eyebrow">Independent software studio</p>
+    <h1 class="reveal">We build small<br>software for <em>real</em><br>places.</h1>
+    <div class="hero-meta">
+      <div><span>Based</span>Philadelphia, PA</div>
+      <div><span>Founded</span>2026</div>
+      <div><span>Focus</span>Mobile apps, one at a time</div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="sec-head">
+      <span class="sec-num mono">01</span>
+      <span class="sec-title">About</span>
+    </div>
+    <div class="about-grid">
+      <p class="about-lede reveal">NCad LLC is a Philadelphia-based software company operated by a single founder — no investors, no growth-hacking, no dark patterns.</p>
+      <div class="about-body reveal">
+        <p>We design and build mobile applications end-to-end: product, design, engineering, and support. Every product we ship starts from a specific, local problem rather than a market opportunity — we'd rather build one thing well for the people who actually need it than build something broad and shallow.</p>
+        <p>Our first release, HITS, came out of a simple observation: Philadelphia has more live music on any given night than any single person can track, and no good way to find it. That's the kind of problem we like — narrow, real, and solvable with software that respects the people using it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="products">
+    <div class="sec-head">
+      <span class="sec-num mono">02</span>
+      <span class="sec-title">Products</span>
+    </div>
+    <div class="product-card reveal">
+      <div class="product-info">
+        <div class="status">Live in Philadelphia</div>
+        <h3>HITS</h3>
+        <p>A mobile app for discovering local live music — every gig posted directly by the artists and venues playing it, sorted by time and distance, with no algorithm deciding what you see. Artists get a free profile, a booking inbox, and simple analytics on who's actually finding their shows.</p>
+        <a class="product-link" href="https://www.howistheset.com" target="_blank" rel="noopener">Visit howistheset.com →</a>
+      </div>
+      <div class="product-shots">
+        <img src="assets/hits-discover.png" alt="HITS Discover screen showing nearby live music listings" loading="lazy" onerror="this.style.display='none'">
+        <img src="assets/hits-map.png" alt="HITS Map view showing gig locations" loading="lazy" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </section>
+
+  <section id="approach">
+    <div class="sec-head">
+      <span class="sec-num mono">03</span>
+      <span class="sec-title">Approach</span>
+    </div>
+    <div class="approach-grid">
+      <div class="approach-item reveal">
+        <div class="num mono">→ 01</div>
+        <h4>Narrow on purpose</h4>
+        <p>One product, one city, one clear problem before anything else gets added to the roadmap.</p>
+      </div>
+      <div class="approach-item reveal">
+        <div class="num mono">→ 02</div>
+        <h4>No dark patterns</h4>
+        <p>No fake urgency, no manipulative retention tricks, no selling attention to advertisers.</p>
+      </div>
+      <div class="approach-item reveal">
+        <div class="num mono">→ 03</div>
+        <h4>Built to last</h4>
+        <p>Software maintained by the person who built it, priced to be sustainable, not to grow at all costs.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="sec-head">
+      <span class="sec-num mono">04</span>
+      <span class="sec-title">Contact</span>
+    </div>
+    <div class="contact-row">
+      <h2 class="reveal">Get in touch.</h2>
+      <div class="contact-details reveal">
+        <a href="mailto:hello@ncadllc.com">hello@ncadllc.com</a>
+        <span class="loc">Philadelphia, PA</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>&copy; 2026 NCad LLC. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="https://www.howistheset.com/privacy.html" target="_blank" rel="noopener">Privacy</a>
+      <a href="https://www.howistheset.com/terms.html" target="_blank" rel="noopener">Terms</a>
+      <a href="mailto:hello@ncadllc.com">hello@ncadllc.com</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
